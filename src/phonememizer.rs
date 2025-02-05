@@ -10,11 +10,10 @@ extern "C" {
                     phoneme_mode: libc::c_int) -> libc::c_int;
 }
 
-
-
-/// FROM ESPEAK DOCS
+/// FROM ESPEAK 
 ///
-/**   phoneme_mode
+/**  
+* phoneme_mode
 	    bit 1:   0=eSpeak's ascii phoneme names, 1= International Phonetic Alphabet (as UTF-8 characters).
         bit 7:   use (bits 8-23) as a tie within multi-letter phonemes names
         bits 8-23:  separator character, between phoneme names
@@ -40,7 +39,7 @@ pub fn convert_to_phonemes(text: &str, lang: Option<&str>, output_type: PhonemeO
     /* wtf is a 0u8? 
      https://stackoverflow.com/questions/53120755/what-do-number-literals-with-a-suffix-like-0u8-mean-in-rust 
     */
-    let mut buffer = vec![0u8; 8096]; // big ass buffer for no reason
+    let mut buffer = vec![0u8; text.len()]; // big ass buffer for no reason
     unsafe {
         let result = text2phoneme(c_text.as_ptr(), 
                                   buffer.as_mut_ptr() as *mut libc::c_char, 
