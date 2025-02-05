@@ -6,13 +6,24 @@ extern "C" {
     fn text2phoneme(input: *const libc::c_char,
                     output_buffer: *mut libc::c_char,
                     buffer_size: libc::c_int,
-                    voice: *const libc::c_char) -> libc::c_int;
+                    voice: *const libc::c_char,
+                    phoneme_mode: libc::c_int) -> libc::c_int;
 }
 
-pub fn convert_to_phonemes(text: &str, lang: Option<&str>) -> Result<String> {
+pub enum PhonemeOutputType {
+    ESpeak,
+    ASCII
+}
+
+
+pub fn convert_to_phonemes(text: &str, lang: Option<&str>, output_type: PhonemeOutputType) -> Result<String> {
     let input_lang = match lang {
         Some(_lang) => _lang,
         None => "en"
+    };
+    let output_type_int: i32 = match output_type {
+        PhonemeOutputType::ESpeak => 0,
+        PhonemeOutputType::ASCII => 2
     };
     let c_text = CString::new(text).map_err(|_| "wtf invalid text input").unwrap();
     let input_ptr = CString::new(input_lang).map_err(|_| "wtf invalid lang input").unwrap();
@@ -25,7 +36,8 @@ pub fn convert_to_phonemes(text: &str, lang: Option<&str>) -> Result<String> {
         let result = text2phoneme(c_text.as_ptr(), 
                                   buffer.as_mut_ptr() as *mut libc::c_char, 
                                   buffer.len() as i32, 
-                                  input_ptr.as_ptr());
+                                  input_ptr.as_ptr(),
+                                  output_type_int);
         if result < 0 {
            return Err(anyhow!("conversion failed with error code {}", result));
         }

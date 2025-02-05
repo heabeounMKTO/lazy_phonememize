@@ -9,6 +9,6 @@ struct CliArgs {
 
 fn main(){
    let args = CliArgs::parse(); 
-   let phonemized = convert_to_phonemes(&args.input_text, Some("en")).unwrap();
+   let phonemized = convert_to_phonemes(&args.input_text, Some("en"), lazy_phonememize::phonememizer::PhonemeOutputType::ASCII).unwrap();
    println!("INPUT_TEXT: {}\nPHONEMIZED: {}", args.input_text, phonemized);
 }

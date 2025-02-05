@@ -3,7 +3,8 @@
 #include <string.h>
 
 
-int text2phoneme(const char *input_text, char *output_buffer, int buffer_size, const char *voice)
+int text2phoneme(const char *input_text, char *output_buffer, 
+                 int buffer_size, const char *voice, const int phoneme_mode)
 {
     if (!input_text || !output_buffer || buffer_size <= 0) {
         return -1;
@@ -13,7 +14,7 @@ int text2phoneme(const char *input_text, char *output_buffer, int buffer_size, c
     }
 
     espeak_SetVoiceByName(voice);
-    const char* phonemes = espeak_TextToPhonemes((const void**)&input_text, 0, 0);
+    const char* phonemes = espeak_TextToPhonemes((const void**)&input_text, 0, phoneme_mode);
     
     if (!phonemes) {
         espeak_Terminate();
