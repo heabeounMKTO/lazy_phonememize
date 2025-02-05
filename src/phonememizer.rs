@@ -10,6 +10,15 @@ extern "C" {
                     phoneme_mode: libc::c_int) -> libc::c_int;
 }
 
+
+
+/// FROM ESPEAK DOCS
+///
+/**   phoneme_mode
+	    bit 1:   0=eSpeak's ascii phoneme names, 1= International Phonetic Alphabet (as UTF-8 characters).
+        bit 7:   use (bits 8-23) as a tie within multi-letter phonemes names
+        bits 8-23:  separator character, between phoneme names
+**/
 pub enum PhonemeOutputType {
     ESpeak,
     ASCII
