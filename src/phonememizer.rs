@@ -9,7 +9,7 @@ extern "C" {
                     voice: *const libc::c_char) -> libc::c_int;
 }
 
-fn convert_to_phonemes(text: &str, lang: Option<&str>) -> Result<String> {
+pub fn convert_to_phonemes(text: &str, lang: Option<&str>) -> Result<String> {
     let input_lang = match lang {
         Some(_lang) => _lang,
         None => "en"
@@ -35,8 +35,3 @@ fn convert_to_phonemes(text: &str, lang: Option<&str>) -> Result<String> {
 }
 
 
-fn main() {
-    let test = "hello world fuck";
-    let test_conv = convert_to_phonemes(test, Some("en")).unwrap();
-    println!("TEST CONVERSION {}", test_conv);
-}

@@ -1,5 +1,5 @@
 [package]
-name = "espeak_test"
+name = "lazy_phonememize"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,3 +7,11 @@ edition = "2021"
 anyhow = "1.0.95"
 clap = { version = "4.5.28", features = ["derive"] }
 libc = "0.2.169"
+
+
+
+[profile.release]
+opt-level = "z"
+strip = true  # WE STRIPPING THE SYMBOLS WITH THIS ONE  🗣️🗣️🔥🔥🔥
+lto = true
+
