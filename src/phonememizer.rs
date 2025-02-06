@@ -41,8 +41,8 @@ pub fn convert_to_phonemes(text: &str, lang: Option<&str>, output_type: PhonemeO
      https://stackoverflow.com/questions/53120755/what-do-number-literals-with-a-suffix-like-0u8-mean-in-rust 
     */
     // println!("[DEBUG] text len {}", text.chars().count());
-    let mut buffer = vec![0u8; text.chars().count() * 8]; // big ass buffer for no reason
-    println!("[DEBUG] `lazy_p buffer len {:?}", &buffer.len());
+    let mut buffer = vec![0u8; 4096]; // big ass buffer for no reason
+    // println!("[DEBUG] `lazy_p buffer len {:?}", &buffer.len());
     unsafe {
         let result = text2phoneme(c_text.as_ptr(), 
                                   buffer.as_mut_ptr() as *mut libc::c_char, 
