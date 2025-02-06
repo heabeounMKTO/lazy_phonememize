@@ -17,10 +17,7 @@ fn main() {
 
     let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
     
-    // Add all necessary search paths
     println!("cargo:rustc-link-search={}", manifest_dir.display());
-    
-    // Add the libs directory paths
     let libs_dir = manifest_dir.join("libs");
     println!("cargo:rustc-link-search={}", libs_dir.display());
     println!("cargo:rustc-link-search={}", libs_dir.join("lib").display());
