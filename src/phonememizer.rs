@@ -71,13 +71,13 @@ impl LazyPhonemizer {
         */
         // println!("[DEBUG] text len {}", text.chars().count());
         let mut buffer = vec![0u8; text.chars().count() * 8]; // big ass buffer for no reason
-        println!("[DEBUG] `lazy_p buffer len {:?}", &buffer.len());
+        println!("[DEBUG] [LazyPhonemizer] `lazy_p buffer len {:?}", &buffer.len());
         unsafe {
             let result = text2phoneme(c_text.as_ptr(), 
                                       buffer.as_mut_ptr() as *mut libc::c_char, 
                                       buffer.len() as i32, 
                                       output_type_int);
-            println!("[DEBUG] conversion REUSLT {}", result);
+            // println!("[DEBUG] conversion REUSLT {}", result);
             if result < 0 {
                return Err(anyhow!("conversion failed with error code {}", result));
             }
