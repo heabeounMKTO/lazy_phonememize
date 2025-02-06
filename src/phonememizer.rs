@@ -1,13 +1,17 @@
 use std::ffi::{CString, CStr};
 use anyhow::{Result,  anyhow};
-use std::mem::size_of;
+use std::sync::Once;
+
+
+static INIT_G2P_LANG: Once = Once::new();
 
 #[link(name="phonememize", kind="static")]
 extern "C" {
+    fn g2p_initialize(voice: *const libc::c_char) -> libc::c_int;
+    fn g2p_terminate();
     fn text2phoneme(input: *const libc::c_char,
                     output_buffer: *mut libc::c_char,
                     buffer_size: libc::c_int,
-                    voice: *const libc::c_char,
                     phoneme_mode: libc::c_int) -> libc::c_int;
 }
 
@@ -25,36 +29,70 @@ pub enum PhonemeOutputType {
 }
 
 
-pub fn convert_to_phonemes(text: &str, lang: Option<&str>, output_type: PhonemeOutputType) -> Result<String> {
-    let input_lang = match lang {
-        Some(_lang) => _lang,
-        None => "en"
-    };
-    let output_type_int: i32 = match output_type {
-        PhonemeOutputType::ESpeak => 0,
-        PhonemeOutputType::ASCII => 2
-    };
-    let c_text = CString::new(text).map_err(|_| "wtf invalid text input").unwrap();
-    let input_ptr = CString::new(input_lang).map_err(|_| "wtf invalid lang input").unwrap();
-    // 
-    /* wtf is a 0u8? 
-     https://stackoverflow.com/questions/53120755/what-do-number-literals-with-a-suffix-like-0u8-mean-in-rust 
-    */
-    // println!("[DEBUG] text len {}", text.chars().count());
-    let mut buffer = vec![0u8; 4096]; // big ass buffer for no reason
-    // println!("[DEBUG] `lazy_p buffer len {:?}", &buffer.len());
-    unsafe {
-        let result = text2phoneme(c_text.as_ptr(), 
-                                  buffer.as_mut_ptr() as *mut libc::c_char, 
-                                  buffer.len() as i32, 
-                                  input_ptr.as_ptr(),
-                                  output_type_int);
-        if result < 0 {
-           return Err(anyhow!("conversion failed with error code {}", result));
+pub struct LazyPhonemizer {
+    pub lang: String,
+    pub init_state: bool
+} 
+
+impl LazyPhonemizer {
+    pub fn init(lang: Option<&str>) -> Result<LazyPhonemizer> {
+        let _init_lang = match lang {
+            Some(_lang) => _lang,
+            None =>"en"
+       };
+
+        let mut init_ok = Ok(());
+        let _lang_ptr = CString::new(_init_lang).map_err(|_| "wtf invalid lang input").unwrap();
+        INIT_G2P_LANG.call_once(|| {
+            unsafe {
+                if  g2p_initialize(_lang_ptr.as_ptr()) < 0 {
+                    init_ok = Err("Failed to init g2p".to_string());
+                }
+            }
+        });
+        Ok(LazyPhonemizer {
+            lang: String::from(_init_lang),
+            init_state: match init_ok {
+                Ok(_) => true,
+                _ => false
+            }
+        })
+    }
+
+    pub fn convert_to_phonemes(&self, text: &str, output_type: PhonemeOutputType) -> Result<String> {
+        let output_type_int: i32 = match output_type {
+            PhonemeOutputType::ESpeak => 0,
+            PhonemeOutputType::ASCII => 2
+        };
+        let c_text = CString::new(text).map_err(|_| "wtf invalid text input").unwrap();
+        // 
+        /* wtf is a 0u8? 
+         https://stackoverflow.com/questions/53120755/what-do-number-literals-with-a-suffix-like-0u8-mean-in-rust 
+        */
+        // println!("[DEBUG] text len {}", text.chars().count());
+        let mut buffer = vec![0u8; text.chars().count() * 8]; // big ass buffer for no reason
+        println!("[DEBUG] `lazy_p buffer len {:?}", &buffer.len());
+        unsafe {
+            let result = text2phoneme(c_text.as_ptr(), 
+                                      buffer.as_mut_ptr() as *mut libc::c_char, 
+                                      buffer.len() as i32, 
+                                      output_type_int);
+            println!("[DEBUG] conversion REUSLT {}", result);
+            if result < 0 {
+               return Err(anyhow!("conversion failed with error code {}", result));
+            }
+            let result_str = CStr::from_ptr(buffer.as_ptr() as *const libc::c_char);
+            Ok(result_str.to_string_lossy().into_owned())
         }
-        let result_str = CStr::from_ptr(buffer.as_ptr() as *const libc::c_char);
-        Ok(result_str.to_string_lossy().into_owned())
+}
+}
+impl Drop for LazyPhonemizer {
+    fn drop(&mut self) {
+        unsafe {
+            g2p_terminate();
+        }
     }
 }
+
 
 
