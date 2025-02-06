@@ -5,7 +5,10 @@ LDFLAGS=-lespeak-ng
 STATIC_LIB_DIR=libs
 
 
-all: libphonememize.a
+all: espeak libphonememize.a
+
+espeak: 
+	cd espeak-ng && ./autogen.sh && ./configure --prefix=$(PWD)/libs && make -j 10 && make install
 
 phonememize.o: phonememize.c phonememize.h
 	$(CC) $(CFLAGS) -c phonememize.c
