@@ -4,12 +4,13 @@ CFLAGS=-Wall -Wextra -fPIC
 LDFLAGS=-lespeak-ng
 STATIC_LIB_DIR=libs
 STATIC_LIB=libphonememize.a
+ESPEAK_CONFIG=--disable-mbrola --disable-klatt --disable-extensions --without-async --without-sonic --disable-shared --enable-static
 
 all: espeak $(STATIC_LIB)
 
 espeak: 
 	mkdir -p $(STATIC_LIB_DIR)
-	cd espeak-ng && ./autogen.sh && ./configure --prefix=$(PWD)/$(STATIC_LIB_DIR) && make -j 10 && make install
+	cd espeak-ng && ./autogen.sh && ./configure --prefix=$(PWD)/$(STATIC_LIB_DIR) $(ESPEAK_CONFIG) && make -j 10 && make install
 
 phonememize.o: phonememize.c phonememize.h
 	$(CC) $(CFLAGS) -c phonememize.c -o $(STATIC_LIB_DIR)/phonememize.o -L libs/
