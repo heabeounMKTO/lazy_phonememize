@@ -1,5 +1,5 @@
 #include "phonememize.h"
-#include <espeak-ng/speak_lib.h>
+#include "./libs/include/espeak-ng/speak_lib.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
