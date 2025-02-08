@@ -9,7 +9,7 @@ struct CliArgs {
 
 fn main(){
    let args = CliArgs::parse(); 
-   let pz = LazyPhonemizer::init(Some("en")).unwrap();
+   let pz = LazyPhonemizer::init(Some("cmn")).unwrap();
     
 let phonemized = pz.convert_to_phonemes(&args.input_text, lazy_phonememize::phonememizer::PhonemeOutputType::ASCII).unwrap();
 

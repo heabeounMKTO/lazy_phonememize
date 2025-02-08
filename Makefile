@@ -4,7 +4,7 @@ CFLAGS=-Wall -Wextra -fPIC
 LDFLAGS=-lespeak-ng
 STATIC_LIB_DIR=libs
 STATIC_LIB=libphonememize.a
-ESPEAK_CONFIG=--disable-mbrola --disable-klatt --disable-extensions --without-async --without-sonic --disable-shared --enable-static
+ESPEAK_CONFIG=--with-chinese --with-chinese-variant --with-japanese --with-japanese-hiragana --with-japanese-katakana --without-sonic --enable-static
 
 all: espeak $(STATIC_LIB)
 
