@@ -65,6 +65,7 @@ int text2phoneme(const char *input_text, char *output_buffer,
         }
     }
     free(text_copy);
+    espeak_Synchronize();
     *output_pos = '\0';
     return 0;
 }
