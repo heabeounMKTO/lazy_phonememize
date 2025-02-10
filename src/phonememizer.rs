@@ -103,7 +103,13 @@ impl LazyPhonemizer {
                 return Err(anyhow!("conversion failed with error code {}", result));
             }
             let result_str = CStr::from_ptr(buffer.as_ptr() as *const libc::c_char);
-            Ok(result_str.to_string_lossy().into_owned())
+            if &self.lang == "cmu" || &self.lang == "jp" {
+                let _res_raw = result_str.to_string_lossy().into_owned();
+                Ok(clean_phonemes(&_res_raw))
+            } else {
+
+                Ok(result_str.to_string_lossy().into_owned())
+            }
         }
     }
 }
