@@ -1,6 +1,7 @@
 use anyhow::{anyhow, Result};
 use std::ffi::{CStr, CString};
 use std::sync::Once;
+use regex::Regex;
 
 static INIT_G2P_LANG: Once = Once::new();
 
@@ -34,6 +35,14 @@ pub struct LazyPhonemizer {
     pub init_state: bool,
 }
 
+
+pub fn clean_phonemes(phonemes: &str) -> String {
+    let number_pattern = Regex::new(r"-\d+|\d+|-").unwrap();
+    let cleaned = number_pattern.replace_all(phonemes, "");
+    let diacritic_pattern = Regex::new(r"̪").unwrap();
+    diacritic_pattern.replace_all(&cleaned, "").into_owned()
+}
+
 impl LazyPhonemizer {
     pub fn init(lang: Option<&str>) -> Result<LazyPhonemizer> {
         let _init_lang = match lang {
@@ -58,6 +67,7 @@ impl LazyPhonemizer {
             },
         })
     }
+
 
     pub fn convert_to_phonemes(
         &self,

@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.95"
 libc = "0.2.169"
+regex = "1.11.1"
 
 [dev-dependencies]
 clap = { version = "4.5.28", features = ["derive"] }

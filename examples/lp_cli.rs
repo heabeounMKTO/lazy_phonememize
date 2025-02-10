@@ -1,5 +1,6 @@
 use clap::Parser;
 use lazy_phonememize::phonememizer::LazyPhonemizer;
+use lazy_phonememize::phonememizer::clean_phonemes;
 
 #[derive(Parser)]
 struct CliArgs {
@@ -27,6 +28,6 @@ fn main() {
         .unwrap();
     println!(
         "INPUT_TEXT: {}\nPHONEMIZED: {}",
-        args.input_text, phonemized
+        args.input_text, clean_phonemes(&phonemized)
     );
 }
